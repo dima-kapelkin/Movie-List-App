@@ -9,38 +9,40 @@ body {
 }
 
 h1 {
-    margin-left: 550px;
-    font-size: 120px;
+    font-size: clamp(40px, 8vw, 120px);;
     color: white;
     font-family: "Arimo", sans-serif;
+    margin-top: 10px;
 }
 
 .violet {
     display: inline-block;
     background: #6532F8;
-    padding-left: 15px;
-    padding-right: 15px;
+    padding:0 15px;
     color: white;
     height: 30px;
     line-height: 30px;
     border-radius: 10px;
+    margin-right: 10px;
+    margin-bottom: 5px;
 } 
-.violet:first-child {
-    margin-left: 550px;
-}
 
 .header {
-    height: 140px;
-    margin-top: 130px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: fit-content;
+    margin: 80px auto 0;
 }
 
 .container {
-    width: 800px;
+    width: 90%;
+    max-width: 800px;
     margin: 0 auto;
     margin-top: 50px;
-    height: 600px;
     background-color:#232323;
     border-radius: 20px;
+    min-height: 400px;
 }
 
 /* Контейнер для инпута и кнопки */
@@ -48,17 +50,15 @@ h1 {
   display: flex;
   align-items: center;
   justify-content:left;
-  gap: 20px;
-  background-color: #232323;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
-  padding: 50px;
+  gap: 15px;
+  padding: 30px;
+  flex-wrap: wrap;
 }
 
 /* Поле ввода */
 .film-input {
-  width: 60%;  
-  max-width: 400px;
+  flex: 1; 
+  min-width: 180px;
   background-color: #232323;
   border: none;
   border-bottom: 1px solid #F3F6F9;
@@ -66,7 +66,6 @@ h1 {
   font-size: 18px;
   padding: 10px 0;
   outline: none;
-  text-align: left;
 }
 
 .film-input::placeholder {
@@ -74,16 +73,13 @@ h1 {
 }
 
 .arrow-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 60px;
-  height: 60px;
-  background-color: #6532F8; /* фиолетовый круг */
-  border: none;
+  width: 55px;
+  height: 55px;
+  background-color: #6532F8;
   border-radius: 50%;
+  border: none;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
 /* убираем возможный чёрный фон внутри */
@@ -128,6 +124,12 @@ h1 {
   margin-bottom: 15px;
   transition: background-color 0.2s ease, transform 0.1s ease;
 }
+.film-item {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeIn 0.3s forwards;
+}
+
 
 /* лёгкий hover-эффект */
 .film-item:hover {
@@ -205,32 +207,43 @@ h1 {
 
 @media (max-width:767px) {
   h1 {
-    margin-left: 30px;
     font-size: 50px;
+    text-align: center;
   }
-  .violet:first-child {
-    margin-left: 30px;
-}
+
 .header {
-    margin-top: 80px;
+    margin-top: 40px;
+    align-items: center;
 }
 .container {
-  width: 100%;
+  width: 95%;
   margin-top: 30px;
 }
+.input {
+    flex-direction: column;
+    align-items: stretch;
+  }
 .film-item {
-  
+    flex-direction: row;
+    padding: 15px 20px;
 }
 .films-list {
 padding:0 5px 5px;
 }
 .film-input{
-  width: 50%;
-  font-size: 13px;
+  width: 100%;
+  font-size: 16px;
 }
 .arrow-btn{
   width: 45px;
   height: 45px;
+  align-self: center;
 }
 }
 
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

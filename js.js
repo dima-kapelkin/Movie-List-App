@@ -1,79 +1,94 @@
-const filmInputNode = document.querySelector('.film-input');
+const filmInput = document.querySelector('.film-input');
 const addFilmBtn = document.querySelector('.arrow-btn');
-const filmListNode = document.querySelector('.films-list');
-const noFilm = 'Введите название фильма!';
-//загрузка фильмов
-loadFilmsFromLs();
-//1 добавление фильма
-addFilmBtn.addEventListener('click',function() {
-    const film = getFilmFromUser();
-    if(!film) {
-        alert(noFilm);
-        return;
-    }
-    addFilm(film);
-    saveFilmsToLs();
-    clearInput();
-});
-//2 удаление фильма
-filmListNode.addEventListener('click',function(e){
-   if(e.target.tagName === 'BUTTON') {
-    e.target.parentElement.remove();
-    saveFilmsToLs();
-   }
-});
-//3 отметка просмотренного
-filmListNode.addEventListener('change',function(e){
-    const filmItem = e.target.closest('.film-item');
-    const filmTitle = filmItem.querySelector('span');
+const filmList = document.querySelector('.films-list');
+const NO_FILM_MSG = 'Введите название фильма';
+const NO_FILMS_MSG = 'Нет фильмов';
 
-    if(e.target.type === 'radio') {
-        if(e.target.checked) {
-          filmItem.classList.add('watched');
-          filmTitle.classList.add('crossed');
-        } else {
-            filmItem.classList.remove('watched');
-          filmTitle.classList.remove('crossed');
-        }
-        saveFilmsToLs();
-    }
-    
+let films = [];
+
+// init
+document.addEventListener('DOMContentLoaded',() => {
+        films = loadFilmsFromStorage();
+        renderFilms()
 });
-//получение фильма
-function getFilmFromUser() {
-    const filmName = filmInputNode.value;
-    if(!filmName) {
-        return;
+
+// добавление фильма
+addFilmBtn.addEventListener('click',() => {
+    const title = filmInput.value;
+    if(!title) {
+        return
     }
-    return filmName;
+
+    const newFilm = {
+        id: Date.now(),
+        title,
+        isWatched: false,
+    }
+    films.push(newFilm)
+    saveFilmsToStorage()
+    renderFilms()
+    clearInput()
+});
+
+// обработка кликов 
+filmList.addEventListener('click',(e) => {
+    const filmId = e.target.closest('.film-item')?.dataset.id;
+    if(!filmId) return;
+
+    //удаление
+    if(e.target.classList.contains('delete-btn')){
+        films = films.filter(f => f.id !== Number(filmId))
+        saveFilmsToStorage();
+        renderFilms(); 
+    }
+
+    // отметка просмотренного
+    if(e.target.type === 'radio') {
+        const film = films.find(f => f.id === Number(filmId))
+        if(film){
+            film.isWatched = e.target.checked
+            saveFilmsToStorage();
+            renderFilms()
+        }
+    }
+
+    
+})
+
+// рендер фильмов
+function renderFilms() {
+    filmList.innerHTML = '';
+    if(films.length === 0) {
+        filmList.innerText = NO_FILMS_MSG;
+        return
+    }
+
+    films.forEach(f => {
+        const filmItem = document.createElement('div');
+        filmItem.classList ='film-item';
+        filmItem.dataset.id = f.id;
+        if(f.isWatched) filmItem.classList.add('watched');
+
+        filmItem.innerHTML = `
+             <input type='radio'${f.isWatched ? 'checked' : ''}/>
+             <span class=${f.isWatched ? 'crossed' : ''}>${f.title}</span>
+             <button class="delete-btn">✖</button>      
+        `
+        filmList.appendChild(filmItem);
+    })
+
+
 }
-//добавление фильма
-function addFilm(filmName) {
-    const filmItem = document.createElement('div')
-    filmItem.classList.add('film-item')
-    filmItem.innerHTML = `
-                     <input type='radio'>
-                     <span>${filmName}</span>
-                     <button class='delete-btn'></button>
-    `
-    filmListNode.appendChild(filmItem);
-};
-//очистка поля
-function clearInput() {
-    filmInputNode.value = '';
-}
-//сохранение в лс
-function saveFilmsToLs() {
-    const films = [];
-    document.querySelectorAll('.film-item').forEach(item => {
-        const title = item.querySelector('span').textContent;
-        const isWatched = item.classList.contains('watched');
-        films.push({title,isWatched});
-    });
+// сохранение в лс
+function saveFilmsToStorage () {
     localStorage.setItem('films',JSON.stringify(films));
 }
-//загрузка из лс
-function loadFilmsFromLs() {
-    const saved = JSON.parse(localStorage.getItem('films')) || [];
-    saved.forEach(film => addFilm(film.title, film.isWatched));
+
+// загрузка из лс
+function loadFilmsFromStorage () {
+     return JSON.parse(localStorage.getItem('films')) || [];
+}
+// клиар инпут
+function clearInput() {
+    filmInput.value = '';
 }
